@@ -2,9 +2,6 @@
 
 function __autoload($className)
 {
-	if (function_exists('smartyAutoload') AND smartyAutoload($className))
-		return true;
-
 	$className = str_replace(chr(0), '', $className);
 	$classDir = dirname(__FILE__).'/../classes/';
 	$overrideDir = dirname(__FILE__).'/../override/classes/';

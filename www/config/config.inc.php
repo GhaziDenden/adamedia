@@ -18,6 +18,7 @@ if (!headers_sent())
 require_once(dirname(__FILE__).'/settings.inc.php');
 
 /* Autoload */
+require_once(dirname(__FILE__).'/../classes/Db.php');
 require_once(dirname(__FILE__).'/autoload.php');
 
 /* Redefine REQUEST_URI if empty (on some webservers...) */

@@ -306,12 +306,10 @@ abstract class DbCore
  */
 function pSQL($string, $htmlOK = false)
 {
-	if (_PS_MAGIC_QUOTES_GPC_)
-		$string = stripslashes($string);
 	if (!is_numeric($string))
 	{
 		$link = Db::getInstance()->getRessource();
-		$string = _PS_MYSQL_REAL_ESCAPE_STRING_ ? mysql_real_escape_string($string, $link) : addslashes($string);
+		$string = mysql_real_escape_string($string, $link);
 		if (!$htmlOK)
 			$string = strip_tags(nl2br2($string));
 	}
