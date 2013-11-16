@@ -1,11 +1,6 @@
 package com.gdconsulting.adamedia.adapters;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.gdconsulting.adamedia.R;
-import com.gdconsulting.adamedia.model.Restaurant;
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,6 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.gdconsulting.adamedia.DataInterface;
+import com.gdconsulting.adamedia.R;
+import com.gdconsulting.adamedia.model.Restaurant;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 
 public class RestaurantsListAdapter extends ArrayAdapter {
@@ -52,7 +52,7 @@ public class RestaurantsListAdapter extends ArrayAdapter {
     	labelDetail.setText(current.getAddress());
     	
     	ImageView image = (ImageView)v.findViewById(R.id.image);
-    	UrlImageViewHelper.setUrlDrawable(image, "http://192.168.1.53/adamedia/www/img/"+current.getThumb()+".png");
+    	UrlImageViewHelper.setUrlDrawable(image, DataInterface.getSingletonInstance().ImagesUrl+current.getThumb()+".png");
       	
         return v;
     }

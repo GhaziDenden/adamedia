@@ -41,6 +41,13 @@ class RestaurantCore extends ObjectModel
 		return $fields;
 	}
 	
+	static public function getRestaurantsList()
+	{
+		return Db::getInstance()->ExecuteS('
+					SELECT *
+					FROM `'._DB_PREFIX_.'restaurants`
+					ORDER BY `id_restaurant` ASC');
+	}
 	
 	static public function getRestaurantsByName($name)
 	{
@@ -55,6 +62,16 @@ class RestaurantCore extends ObjectModel
 			$restaurants[$i]['thumb'] = Image::getThumbnailByRestaurant($restaurant['id_restaurant']);
 			$restaurants[$i]['thumb'] = $restaurants[$i]['thumb']['id_image'];
 			$restaurants[$i]['images'] = Image::getImageByRestaurant($restaurant['id_restaurant']);
+			
+			$groups = MenuGroup::getGroupByRestaurant($restaurant['id_restaurant']);
+			$j = 0;
+			foreach($groups as $group){
+				$groups[$j]['items'] = MenuItem::getItemsByGroup($group['id_menu_group']);
+				$j++;
+			}
+			
+			$restaurants[$i]['details'] = ( (count($groups) == 0) ? "" : $groups);
+			
 			$i++;
 		}
 		return $restaurants;
@@ -76,6 +93,5 @@ class RestaurantCore extends ObjectModel
 		// @todo
 		return NULL;
 	}
-	
 	
 }

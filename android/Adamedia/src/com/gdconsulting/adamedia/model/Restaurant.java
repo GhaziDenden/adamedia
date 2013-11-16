@@ -1,6 +1,9 @@
 package com.gdconsulting.adamedia.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class Restaurant {
 
@@ -18,8 +21,17 @@ public class Restaurant {
 
 	public 	String thumb;
 	public 	String[] images;
+
+	public List<String> listDataGroup = new ArrayList<String>();;
+	public HashMap<String, List<String>> listDataItems = new HashMap<String, List<String>>();
 	
 	
+	public HashMap<String, List<String>> getListDataItems() {
+		return listDataItems;
+	}
+	public void setListDataItems(HashMap<String, List<String>> listDataItems) {
+		this.listDataItems = listDataItems;
+	}
 	public int getId() {
 		return id;
 	}
@@ -98,6 +110,12 @@ public class Restaurant {
 	public void setImages(String[] images) {
 		this.images = images;
 	}
+	public List<String> getListDataGroup() {
+		return listDataGroup;
+	}
+	public void setListDataGroup(List<String> listDataGroup) {
+		this.listDataGroup = listDataGroup;
+	}
 	
 	@Override
 	public String toString() {
@@ -106,7 +124,8 @@ public class Restaurant {
 				+ ", country=" + country + ", type=" + type + ", phone="
 				+ phone + ", email=" + email + ", latitude=" + latitude
 				+ ", longitude=" + longitude + ", thumb=" + thumb + ", images="
-				+ Arrays.toString(images) + "]";
+				+ Arrays.toString(images) + ", listDataGroup=" + listDataGroup
+				+ ", listDataItems=" + listDataItems + "]";
 	}
 	
 }

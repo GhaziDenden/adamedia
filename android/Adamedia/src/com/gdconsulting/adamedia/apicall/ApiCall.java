@@ -10,13 +10,15 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class ApiCall extends AsyncTask<String, String, String>{
+public class ApiCall extends AsyncTask<String, String, ApiResult>{
 	 
 	protected OnApiCallCompleted listener;
 	protected Context context;
@@ -37,40 +39,72 @@ public class ApiCall extends AsyncTask<String, String, String>{
     }
 	
     @Override
-    protected String doInBackground(String... uri) {
+    protected ApiResult doInBackground(String... uri) {
 
         HttpClient httpclient = new DefaultHttpClient();
+        ApiResult apiResult = new ApiResult();
         HttpResponse response;
         String responseString = null;
+        
         try {
             response = httpclient.execute(new HttpGet(uri[0]));
             StatusLine statusLine = response.getStatusLine();
+            
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 response.getEntity().writeTo(out);
                 out.close();
                 responseString = out.toString();
+
+    	        Log.e("responseString", "responseString : "+responseString);
+                
+            	JSONObject jsonObject;
+				try {
+					jsonObject = new JSONObject(responseString);
+    		        
+    		    	String state = jsonObject.getString("state");
+    		    	JSONObject data = new JSONObject();
+    		    	if (!jsonObject.getString("result").equals("")) data = jsonObject.getJSONObject("result");
+    		    	String errors = "";
+    		    	if (!jsonObject.getString("errors").equals("")) errors = jsonObject.getString("errors");
+    		    	
+    		    	if (state.equals("OK")) apiResult.setStatus(ApiResult.RESULT_OK);
+    		    	else apiResult.setStatus(ApiResult.RESULT_KO);
+    		    	apiResult.setData(data);
+    		    	apiResult.setErrors(errors);
+    		    	
+				} catch (JSONException e) {
+
+	    	        Log.e("JSONException", ""+e.getLocalizedMessage());
+					apiResult.setStatus(ApiResult.SERVER_ERROR);
+				}
+                
             } else{
                 //Closes the connection.
                 response.getEntity().getContent().close();
-                throw new IOException(statusLine.getReasonPhrase());
+                apiResult.setStatus(ApiResult.CNX_ERROR);
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
+            apiResult.setStatus(ApiResult.UNKNOWN_ERROR);
         } catch (IOException e) {
             e.printStackTrace();
+            apiResult.setStatus(ApiResult.UNKNOWN_ERROR);
         }
-        return responseString;
+        return apiResult;
     }
  
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(ApiResult result) {
         super.onPostExecute(result);
         Log.e("onPostExecute", ""+result);
-        listener.onApiCallCompleted(result);
-        
+        if (result.getStatus() == ApiResult.RESULT_OK)
+        	listener.onApiCallCompleted(result);
+        else listener.onApiCallError(result);
+        	
         if (progressDialog.isShowing()) {
         	progressDialog.dismiss();
         }
     }
+    
 }

@@ -2,22 +2,32 @@ package com.gdconsulting.adamedia.fragments;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.gdconsulting.adamedia.DataInterface;
 import com.gdconsulting.adamedia.R;
+import com.gdconsulting.adamedia.RestaurantActivity;
 import com.gdconsulting.adamedia.adapters.RestaurantsListAdapter;
 import com.gdconsulting.adamedia.apicall.ApiCall;
+import com.gdconsulting.adamedia.apicall.ApiResult;
 import com.gdconsulting.adamedia.apicall.OnApiCallCompleted;
 import com.gdconsulting.adamedia.model.Restaurant;
 
@@ -27,11 +37,13 @@ public class SearchFragment extends Fragment {
 	private ArrayList<Restaurant> currentData = new ArrayList<Restaurant>();
 	private RestaurantsListAdapter adapter;
 	private boolean restaurantsShown = false;
+	private Menu optionsMenu;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
+		setHasOptionsMenu(true);
 		getActivity().setTitle("Search");
 		
 		View myFragmentView = inflater.inflate(R.layout.searchfragment,
@@ -41,21 +53,15 @@ public class SearchFragment extends Fragment {
 		
 		adapter = new RestaurantsListAdapter(getActivity(),currentData);
         listView.setAdapter(adapter);
-        
-		/*
-		Button button = (Button) myFragmentView.findViewById(R.id.button);
-		button.setOnClickListener(new View.OnClickListener() {
+        listView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
-			public void onClick(View v) {
-				AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-						.create();
-				alertDialog.setTitle("Search");
-				alertDialog.setMessage("Search Message");
-				alertDialog.show();
+			public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+				DataInterface.getSingletonInstance().setCurrentRestaurant(currentData.get(position));
+				getActivity().startActivity(new Intent(getActivity(), RestaurantActivity.class));
 			}
-		});
-		*/
+        	
+        });
 		
         if (!restaurantsShown){
         	getRestaurants();
@@ -66,44 +72,71 @@ public class SearchFragment extends Fragment {
 	}
 	
 	public void getRestaurants(){
-		new ApiCall(getActivity(),"Restaurants",new Callback()).execute("http://192.168.1.53/adamedia/www/ws/searchRestaurant.php?type=1&name=res");
+		new ApiCall(getActivity(),"Restaurants",new Callback()).execute(DataInterface.getSingletonInstance().WSUrl+"searchRestaurant.php?type=1&name=res");
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		this.optionsMenu = menu;
+	    inflater.inflate(R.menu.search_menu, menu);
+	    super.onCreateOptionsMenu(menu,inflater);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    	case R.id.airport_menuRefresh:
+	    		getRestaurants();
+	    		return true;
+	    }
+	    return super.onOptionsItemSelected(item);
+	}
+	
+	public void setRefreshActionButtonState(final boolean refreshing) {
+	    if (optionsMenu != null) {
+	        final MenuItem refreshItem = optionsMenu.findItem(R.id.airport_menuRefresh);
+	        if (refreshItem != null) {
+	            if (refreshing) {
+	                refreshItem.setActionView(R.layout.actionbar_indeterminate_progress);
+	            } else {
+	                refreshItem.setActionView(null);
+	            }
+	        }
+	    }
 	}
 	
 	
 	public class Callback implements OnApiCallCompleted{
 	    @Override
-	    public void onApiCallCompleted(String result) {
+	    public void onApiCallCompleted(ApiResult result) {
 	        Log.e("onApiCallCompleted", "onApiCallCompleted");
-
-	        JSONObject jsonObject;
+	        
+	        JSONObject jsonObject = result.getData();
+	        
 			try {
-				jsonObject = new JSONObject(result);
-		        
-		    	String state = jsonObject.getString("state"); 
-		    	JSONObject resultString = jsonObject.getJSONObject("result");
-		    	String errors = jsonObject.getString("errors");
-		    	
-		    	if (state.equals("OK")){
-		    		
-		    		JSONArray restaurantsObject = new JSONArray(resultString.getString("restaurants"));
-		    		
-		    		for(int i=0;i<restaurantsObject.length();i++){
-		                JSONObject json_restaurant = restaurantsObject.getJSONObject(i);
-		                
-		                Restaurant restaurant = new Restaurant();
-		                restaurant.setId(json_restaurant.getInt("id_restaurant"));
-		                restaurant.setName(json_restaurant.getString("name"));
-		                restaurant.setAddress(json_restaurant.getString("address"));
-		                restaurant.setCity(json_restaurant.getString("city"));
-		                restaurant.setZipcode(json_restaurant.getInt("zipcode"));
-		                restaurant.setCountry(json_restaurant.getString("country"));
-		                restaurant.setType(json_restaurant.getString("type"));
-		                restaurant.setPhone(json_restaurant.getString("phone"));
-		                restaurant.setEmail(json_restaurant.getString("email"));
-		                restaurant.setLatitude(json_restaurant.getDouble("latitude"));
-		                restaurant.setLongitude(json_restaurant.getDouble("longitude"));
-		                restaurant.setThumb(json_restaurant.getString("thumb"));
-		                
+
+	    		currentData.clear();
+	    		JSONArray restaurantsObject = new JSONArray(jsonObject.getString("restaurants"));
+	    		
+	    		for(int i=0;i<restaurantsObject.length();i++){
+	                JSONObject json_restaurant = restaurantsObject.getJSONObject(i);
+	                
+	                Restaurant restaurant = new Restaurant();
+	                restaurant.setId(json_restaurant.getInt("id_restaurant"));
+	                restaurant.setName(json_restaurant.getString("name"));
+	                restaurant.setAddress(json_restaurant.getString("address"));
+	                restaurant.setCity(json_restaurant.getString("city"));
+	                restaurant.setZipcode(json_restaurant.getInt("zipcode"));
+	                restaurant.setCountry(json_restaurant.getString("country"));
+	                restaurant.setType(json_restaurant.getString("type"));
+	                restaurant.setPhone(json_restaurant.getString("phone"));
+	                restaurant.setEmail(json_restaurant.getString("email"));
+	                restaurant.setLatitude(json_restaurant.getDouble("latitude"));
+	                restaurant.setLongitude(json_restaurant.getDouble("longitude"));
+	                restaurant.setThumb(json_restaurant.getString("thumb"));
+	                
+    		    	if (!json_restaurant.getString("images").equals("")){
+	                
 		                JSONArray restaurantsImages = new JSONArray(json_restaurant.getString("images"));
 		                String[] images = new String[restaurantsImages.length()];
 		                
@@ -115,28 +148,55 @@ public class SearchFragment extends Fragment {
 		                }
 		                
 		                restaurant.setImages(images);
-			    		Log.e("ghazi state restaurant", restaurant.toString());
-			    		currentData.add(restaurant);
-		    		}
+    		    	
+    		    	}
+    		    	
+    		    	if (!json_restaurant.getString("details").equals("")){
+	                
+		                JSONArray restaurantsDetails = new JSONArray(json_restaurant.getString("details"));
+		                List<String> groups = new ArrayList<String>();
+		                HashMap<String, List<String>> ListItems = new HashMap<String, List<String>>();
+		                
+		                Log.e("restaurantsDetails.length()", ""+restaurantsDetails.length());
+		                
+		                for(int j=0;j<restaurantsDetails.length();j++){
+			                JSONObject json_restaurant_group = restaurantsDetails.getJSONObject(j);
+			                groups.add(json_restaurant_group.getString("name"));
+			                
+			                List<String> items = new ArrayList<String>();
+				            if (!json_restaurant_group.getString("items").equals("")){
+			                	JSONArray restaurantsItems = new JSONArray(json_restaurant_group.getString("items"));
+			                	 
+			                	for(int k=0;k<restaurantsItems.length();k++){
+					                JSONObject json_restaurant_item = restaurantsItems.getJSONObject(k);
+					                items.add(json_restaurant_item.getString("name"));
+			                	}
+			                }
+			                
+			                ListItems.put(json_restaurant_group.getString("name"), items);
+		                }
+		                
+		                restaurant.setListDataGroup(groups);
+		                restaurant.setListDataItems(ListItems);
+    		    	
+    		    	}
+		    		currentData.add(restaurant);
+	    		}
+	    		
+	    		Log.e("currentData", ""+currentData);
+	    		adapter.notifyDataSetChanged();
 		    		
-		    		adapter.notifyDataSetChanged();
-		    		
-		    	}else if (state.equals("KO")){
-		    		Log.e("ghazi state", "KO");
-		    	}
-		    	
-		    	
-		    	
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 	        
 	    }
 	    @Override
-	    public void onApiCallError(String result) {
+	    public void onApiCallError(ApiResult result) {
 	        Log.e("onApiCallError", "onApiCallError");
-	        Log.e("onApiCallError", ""+result);
+	        Log.e("onApiCallError", ""+result.toString());
 	    }
 	}
+	
 
 }

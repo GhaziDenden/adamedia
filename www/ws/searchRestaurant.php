@@ -15,18 +15,19 @@ $latitude = Tools::getValue('latitude');
 $longitude = Tools::getValue('longitude');
 
 
-$state = NULL;
+$state = "";
+$data = NULL;
 $result = NULL;
 $errors = NULL;
 
 if (empty($type))
-	$errors[] = 'You need to choose a type of research';
+	$errors = 'You need to choose a type of search';
 	
 if (!empty($latitude) && !Validate::isCoordinate($latitude))
-	$errors[] = 'Incorrect latitude';
+	$errors = 'Incorrect latitude';
 	
 if (!empty($longitude) && !Validate::isCoordinate($longitude))
-	$errors[] = 'Incorrect longitude';
+	$errors = 'Incorrect longitude';
 
 if (count($errors) == 0){
 	
@@ -50,14 +51,14 @@ if (count($errors) == 0){
 	}
 	
 	$state = 'OK';
-	$result['restaurants'] = $data;
+	$result['restaurants'] = ($data == NULL ? "" : $data);
 	
 }else $state = 'KO';
 
 $reply = NULL;
 $reply['state'] = $state;
-$reply['result'] = $result;
-$reply['errors'] = $errors;
+$reply['result'] = ($result == NULL ? "" : $result);
+$reply['errors'] = ($errors == NULL ? "" : $errors);
 
 
 echo json_encode($reply);

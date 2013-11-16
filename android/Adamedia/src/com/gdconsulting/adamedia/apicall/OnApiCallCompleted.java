@@ -1,6 +1,6 @@
 package com.gdconsulting.adamedia.apicall;
 
 public interface OnApiCallCompleted{
-    void onApiCallCompleted(String result);
-    void onApiCallError(String result);
+    void onApiCallCompleted(ApiResult result);
+    void onApiCallError(ApiResult result);
 }

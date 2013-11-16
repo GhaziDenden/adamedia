@@ -7,5 +7,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Ghazi/workspace/testdrawer/libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/urlimageviewhelper-1.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/google-play-services.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

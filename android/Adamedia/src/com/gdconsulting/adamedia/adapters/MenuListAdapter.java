@@ -17,12 +17,14 @@ public class MenuListAdapter extends ArrayAdapter {
   	 
     private Context context;
     private LayoutInflater vi;
+    private int currentPosition;
     private ArrayList<MenuItem> currentList = null;
  
-    public MenuListAdapter(Context context,ArrayList<MenuItem> currentList) {
+    public MenuListAdapter(Context context, ArrayList<MenuItem> currentList, int currentPosition) {
         super(context,0, currentList);
         this.context = context;
         this.currentList = currentList;
+        this.currentPosition = currentPosition;
         vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
     
@@ -40,21 +42,12 @@ public class MenuListAdapter extends ArrayAdapter {
         
         if (current.isSection())
         	return createSectionCell(v, current);
-        else return createValueCell(v, current);
+        else return createValueCell(v, current, position);
         
-    	/*
-    	labelName.setText(current.getName());
-    	
-    	TextView labelDetail = (TextView)v.findViewById(R.id.restaurant_detail);
-    	labelDetail.setText(current.getAddress());
-    	
-    	ImageView image = (ImageView)v.findViewById(R.id.image);
-    	UrlImageViewHelper.setUrlDrawable(image, "http://192.168.1.53/adamedia/www/img/"+current.getThumb()+".png");
-      	*/
     }
     
     
-    private View createValueCell(View v, MenuItem item){
+    private View createValueCell(View v, MenuItem item, int position){
     	v = vi.inflate(R.layout.row_menu, null);
    
     	final View bar = (View)v.findViewById(R.id.left_bar);
@@ -63,8 +56,12 @@ public class MenuListAdapter extends ArrayAdapter {
     	final TextView labelName = (TextView)v.findViewById(R.id.label);
     	labelName.setText(item.getLabel());
     	
+    	if (position == currentPosition)
+    		v.setBackgroundColor(0xFF99E5FF);
+    	
     	return v;
     }
+    
     
     private View createSectionCell(View v, MenuItem item){
     	v = vi.inflate(R.layout.row_menu_section, null);
