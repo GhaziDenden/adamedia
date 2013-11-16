@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="150sp"
+    	android:orientation="horizontal"
+    	>
+        
+        <LinearLayout 
+            android:layout_width="0sp"
+    		android:layout_height="match_parent"
+    		android:layout_weight=".30"
+    		>
+            
+            <ImageView 
+                android:id="@+id/restaurant_image"
+                android:layout_width="match_parent"
+    			android:layout_height="match_parent"
+                />
+            
+        </LinearLayout>
+        
+        
+        <LinearLayout 
+            android:layout_width="0sp"
+    		android:layout_height="match_parent"
+    		android:layout_weight=".70"
+    		android:orientation="vertical"
+    		android:padding="20sp"
+    		android:gravity="center_vertical"
+    		>
+            
+            <TextView 
+                android:id="@+id/restaurant_name"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:textSize="16sp"
+    			android:textStyle="bold"
+                />
+            
+            <TextView 
+                android:id="@+id/restaurant_address"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:maxLines="2"
+    			android:textSize="12sp"
+                />
+            
+            <TextView 
+                android:id="@+id/restaurant_phone"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:textSize="12sp"
+    			android:textStyle="bold"
+                />
+            
+            <TextView 
+                android:id="@+id/restaurant_email"
+                android:layout_width="match_parent"
+    			android:layout_height="wrap_content"
+    			android:textSize="12sp"
+    			android:textStyle="bold"
+                />
+            
+        </LinearLayout>
+        
+        
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	>
+        
+        <Button 
+            android:id="@+id/restaurant_call_action"
+            android:layout_width="0sp"
+    		android:layout_height="wrap_content"
+    		android:layout_weight=".50"
+    		android:text="Call"
+            />
+        
+        <Button 
+            android:id="@+id/restaurant_email_action"
+            android:layout_width="0sp"
+    		android:layout_height="wrap_content"
+    		android:layout_weight=".50"
+    		android:text="Email"
+            />
+        
+    </LinearLayout>
+
+    
+    <ExpandableListView
+	       android:id="@+id/restaurant_details"
+	       android:layout_height="match_parent"
+	       android:layout_width="match_parent"
+	       android:groupIndicator="@null"/>   
+    
+    
+</LinearLayout>
